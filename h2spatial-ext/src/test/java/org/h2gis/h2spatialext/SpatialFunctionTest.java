@@ -25,7 +25,9 @@ package org.h2gis.h2spatialext;
 
 import com.vividsolutions.jts.geom.*;
 import com.vividsolutions.jts.io.WKTReader;
+
 import org.h2.jdbc.JdbcSQLException;
+import org.h2.value.Value;
 import org.h2.value.ValueGeometry;
 import org.h2gis.h2spatial.internal.function.spatial.properties.ST_CoordDim;
 import org.h2gis.h2spatial.ut.SpatialH2UT;
@@ -1695,7 +1697,7 @@ public class SpatialFunctionTest {
     public void test_ST_Expand3() throws Exception {
         ResultSet rs = st.executeQuery("SELECT ST_Expand('POINT (100 150)'::GEOMETRY, 5, -10);");
         rs.next();
-        assertEquals(ValueGeometry.get("LINESTRING (95 150, 105 150)").getGeometry(), rs.getObject(1));
+        assertEquals(Value.getGeometryFactory().get("LINESTRING (95 150, 105 150)").getGeometry(), rs.getObject(1));
         rs.close();
     }
 
@@ -1795,7 +1797,7 @@ public class SpatialFunctionTest {
         rs.next();
         //Test if the wall is created
         assertGeometryEquals("MULTIPOLYGON(((0 0 0, 0 0 10, 1 0 10, 1 0 0, 0 0 0)))", 
-                ValueGeometry.getFromGeometry(((Geometry) rs.getObject(1)).getGeometryN(1)).getBytes());
+        		Value.getGeometryFactory().get(((Geometry) rs.getObject(1)).getGeometryN(1)).getBytes());
         rs.close();
     }
 
@@ -1805,15 +1807,15 @@ public class SpatialFunctionTest {
         rs.next();
         Geometry outputGeom = (Geometry) rs.getObject(1);
         //Test the floor
-        assertGeometryEquals("POLYGON ((0 0 0, 0 1 0, 1 1 0, 1 0 0, 0 0 0))", ValueGeometry.getFromGeometry(outputGeom.getGeometryN(0)).getBytes());
+        assertGeometryEquals("POLYGON ((0 0 0, 0 1 0, 1 1 0, 1 0 0, 0 0 0))", Value.getGeometryFactory().get(outputGeom.getGeometryN(0)).getBytes());
 
         //Test if the walls are created
         assertGeometryEquals("MULTIPOLYGON (((0 0 0, 0 0 10, 0 1 10, 0 1 0, 0 0 0)), "
                 + "((0 1 0, 0 1 10, 1 1 10, 1 1 0, 0 1 0)), ((1 1 0, 1 1 10, 1 0 10, 1 0 0, 1 1 0)), "
-                + "((1 0 0, 1 0 10, 0 0 10, 0 0 0, 1 0 0))))", ValueGeometry.getFromGeometry(outputGeom.getGeometryN(1)).getBytes());
+                + "((1 0 0, 1 0 10, 0 0 10, 0 0 0, 1 0 0))))", Value.getGeometryFactory().get(outputGeom.getGeometryN(1)).getBytes());
 
         //Test the roof
-        assertGeometryEquals("POLYGON((0 0 10, 1 0 10, 1 1 10, 0 1 10, 0 0 10))", ValueGeometry.getFromGeometry(outputGeom.getGeometryN(2)).getBytes());
+        assertGeometryEquals("POLYGON((0 0 10, 1 0 10, 1 1 10, 0 1 10, 0 0 10))", Value.getGeometryFactory().get(outputGeom.getGeometryN(2)).getBytes());
 
         rs.close();
     }
@@ -1825,15 +1827,15 @@ public class SpatialFunctionTest {
         rs.next();
         Geometry outputGeom = (Geometry) rs.getObject(1);
         //Test the floor
-        assertGeometryEquals("POLYGON ((0 10 0, 10 10 0, 10 0 0, 0 0 0, 0 10 0), (1 3 0, 1 1 0, 3 1 0, 3 3 0, 1 3 0))", ValueGeometry.getFromGeometry(outputGeom.getGeometryN(0)).getBytes());
+        assertGeometryEquals("POLYGON ((0 10 0, 10 10 0, 10 0 0, 0 0 0, 0 10 0), (1 3 0, 1 1 0, 3 1 0, 3 3 0, 1 3 0))", Value.getGeometryFactory().get(outputGeom.getGeometryN(0)).getBytes());
           
         //Test if the walls are created
         assertGeometryEquals("MULTIPOLYGON (((0 10 0, 0 10 10, 10 10 10, 10 10 0, 0 10 0)), ((10 10 0, 10 10 10, 10 0 10, 10 0 0, 10 10 0)), ((10 0 0, 10 0 10, 0 0 10, 0 0 0, 10 0 0)), ((0 0 0, 0 0 10, 0 10 10, 0 10 0, 0 0 0)), ((1 3 0, 1 3 10, 1 1 10, 1 1 0, 1 3 0)), ((1 1 0, 1 1 10, 3 1 10, 3 1 0, 1 1 0)), ((3 1 0, 3 1 10, 3 3 10, 3 3 0, 3 1 0)), ((3 3 0, 3 3 10, 1 3 10, 1 3 0, 3 3 0)))",
-                ValueGeometry.getFromGeometry(outputGeom.getGeometryN(1)).getBytes());
+        		Value.getGeometryFactory().get(outputGeom.getGeometryN(1)).getBytes());
 
         //Test the roof        
         assertGeometryEquals("POLYGON ((0 10 10, 0 0 10, 10 0 10, 10 10 10, 0 10 10), (1 3 10, 3 3 10, 3 1 10, 1 1 10, 1 3 10))",
-                ValueGeometry.getFromGeometry(outputGeom.getGeometryN(2)).getBytes());
+        		Value.getGeometryFactory().get(outputGeom.getGeometryN(2)).getBytes());
         rs.close();
     }
 
@@ -2140,7 +2142,7 @@ public class SpatialFunctionTest {
         for (int i = 0; i < pols.getNumGeometries(); i++) {
             Geometry pol = pols.getGeometryN(i);
             assertTrue(ST_CoordDim.getCoordinateDimension(
-                    ValueGeometry.getFromGeometry(pol).getBytesNoCopy()) == 3);
+            		Value.getGeometryFactory().get(pol).getBytesNoCopy()) == 3);
         }
         rs.close();
     }
@@ -2153,7 +2155,7 @@ public class SpatialFunctionTest {
         for (int i = 0; i < pols.getNumGeometries(); i++) {
             Geometry pol = pols.getGeometryN(i);
             assertTrue(ST_CoordDim.getCoordinateDimension(
-                    ValueGeometry.getFromGeometry(pol).getBytesNoCopy()) == 3);
+            		Value.getGeometryFactory().get(pol).getBytesNoCopy()) == 3);
         }
         rs.close();
     }
@@ -2922,7 +2924,7 @@ public class SpatialFunctionTest {
         assertNotNull(results);
         assertFalse((Boolean)results[0]);
         assertEquals( "Self-intersection", results[1]);
-        assertGeometryEquals("POINT(207.3066943435392 270.9366891541256)", ValueGeometry.getFromGeometry(results[2]).getBytes());
+        assertGeometryEquals("POINT(207.3066943435392 270.9366891541256)", Value.getGeometryFactory().get(results[2]).getBytes());
         rs.close();
     }
     
@@ -2989,7 +2991,7 @@ public class SpatialFunctionTest {
         assertNotNull(results);
         assertFalse((Boolean) results[0]);
         assertEquals("Ring Self-intersection", results[1]);
-        assertGeometryEquals("POINT(3 0)", ValueGeometry.getFromGeometry(results[2]).getBytes());
+        assertGeometryEquals("POINT(3 0)", Value.getGeometryFactory().get(results[2]).getBytes());
         rs.close();
     }
     

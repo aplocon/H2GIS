@@ -26,6 +26,9 @@ package org.h2gis.spatialut;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
+
+import org.h2.value.JTSValueGeometry;
+import org.h2.value.Value;
 import org.h2.value.ValueGeometry;
 
 import java.sql.SQLException;
@@ -56,7 +59,7 @@ public class GeometryAsserts {
         if (expectedWKT == null) {
             assertNull(valueWKB);
         } else {
-            assertGeometryEquals(expectedWKT, ValueGeometry.get(valueWKB).getObject());
+            assertGeometryEquals(expectedWKT, Value.getGeometryFactory().get(valueWKB).getObject());
         }
     }
 
@@ -84,9 +87,9 @@ public class GeometryAsserts {
         if (expectedWKT == null) {
             assertNull(valueObject);
         } else {
-            ValueGeometry expected = ValueGeometry.get(expectedWKT, expectedSRID);
-            ValueGeometry actual = ValueGeometry.getFromGeometry(valueObject);
-            assertEquals("Expected:\n" + expected.getWKT() + "\nActual:\n" + actual.getWKT(), expected, actual);
+            ValueGeometry<?> expected = Value.getGeometryFactory().get(expectedWKT, expectedSRID);
+            ValueGeometry<?> actual = Value.getGeometryFactory().get(valueObject);
+            assertEquals("Expected:\n" + expected.getString() + "\nActual:\n" + actual.getString(), expected, actual);
         }
     }
     /**
@@ -97,7 +100,7 @@ public class GeometryAsserts {
      * @throws SQLException
      */
     public static void assertGeometryEquals(String expectedWKT, String valueWKT) throws SQLException {
-        assertGeometryEquals(expectedWKT, ValueGeometry.get(valueWKT).getBytes());
+        assertGeometryEquals(expectedWKT, Value.getGeometryFactory().get(valueWKT).getBytes());
     }
 
     /**
@@ -129,7 +132,7 @@ public class GeometryAsserts {
      */
     public static void assertGeometryBarelyEquals(String expectedWKT,int expectedSRID, Object resultSetObject, double epsilon) {
         assertTrue(resultSetObject instanceof Geometry);
-        Geometry expectedGeometry = ValueGeometry.get(expectedWKT, expectedSRID).getGeometry();
+        Geometry expectedGeometry = ((JTSValueGeometry)Value.getGeometryFactory().get(expectedWKT, expectedSRID)).getGeometry();
         Geometry result = (Geometry) resultSetObject;
         assertEquals(expectedGeometry.getGeometryType(), result.getGeometryType());
         assertEquals(expectedGeometry.getNumPoints(), result.getNumPoints());

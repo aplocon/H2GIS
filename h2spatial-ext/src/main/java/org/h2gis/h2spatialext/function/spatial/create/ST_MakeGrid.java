@@ -19,12 +19,16 @@ package org.h2gis.h2spatialext.function.spatial.create;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+
+import org.h2.value.JTSValueGeometry;
 import org.h2.value.Value;
-import org.h2.value.ValueGeometry;
 import org.h2.value.ValueString;
 import org.h2gis.h2spatialapi.AbstractFunction;
+
 import static org.h2gis.h2spatialapi.Function.PROP_REMARKS;
+
 import org.h2gis.h2spatialapi.ScalarFunction;
+
 import static org.h2gis.h2spatialapi.ScalarFunction.PROP_NOBUFFER;
 
 /**
@@ -66,8 +70,8 @@ public class ST_MakeGrid extends AbstractFunction implements ScalarFunction {
         if (value instanceof ValueString) {
             GridRowSet gridRowSet = new GridRowSet(connection, deltaX, deltaY, value.getString());
             return gridRowSet.getResultSet();
-        } else if (value instanceof ValueGeometry) {
-            ValueGeometry geom = (ValueGeometry) value;
+        } else if (value instanceof JTSValueGeometry) {
+        	JTSValueGeometry geom = (JTSValueGeometry) value;
             GridRowSet gridRowSet = new GridRowSet(connection, deltaX, deltaY, geom.getGeometry().getEnvelopeInternal());
             return gridRowSet.getResultSet();
         } else {
